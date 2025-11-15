@@ -1,11 +1,11 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, LayoutGroup } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { Onboarding } from './components/Onboarding'; // <-- Импортируем
+import { Onboarding } from './components/Onboarding';
+import { Sidebar } from './components/Sidebar';
 
 export const RootLayout = () => {
   const location = useLocation();
-  // Состояние, которое отвечает за показ онбординга
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
@@ -16,29 +16,25 @@ export const RootLayout = () => {
   }, []);
 
   const handleOnboardingComplete = () => {
-    // Прячем онбординг и ставим метку в localStorage
     setShowOnboarding(false);
     localStorage.setItem('hasVisitedRuStore', 'true');
   };
 
   return (
-    // Добавляем новый контейнер для Sidebar
-    <div className="flex bg-[#1c1c1d]">
-        {/* Здесь будет Sidebar */}
-
-        {/* Основной контент */}
-        <div className="flex-grow">
-            <LayoutGroup>
-              <AnimatePresence mode="wait">
-                  {/* Показываем онбординг, если нужно */}
-                  {showOnboarding && <Onboarding onComplete={handleOnboardingComplete} />}
-
-                  <div key={location.pathname}>
-                    <Outlet />
-                  </div>
-              </AnimatePresence>
-            </LayoutGroup>
-        </div>
+    <div className="flex bg-[#1c1c1d] text-white min-h-screen">
+      <Sidebar />
+      <main className="flex-grow w-full overflow-hidden">
+        <LayoutGroup>
+          <AnimatePresence mode="wait">
+            {showOnboarding && <Onboarding onComplete={handleOnboardingComplete} />}
+          </AnimatePresence>
+          <AnimatePresence mode="wait">
+              <div key={location.pathname + location.search}>
+                <Outlet />
+              </div>
+          </AnimatePresence>
+        </LayoutGroup>
+      </main>
     </div>
   );
 };

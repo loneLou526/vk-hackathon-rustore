@@ -6,15 +6,19 @@ import { RootLayout } from './RootLayout';
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <RootLayout />, // Теперь корневой элемент - это наш Layout
-    children: [ // А страницы становятся его дочерними элементами
+    element: <RootLayout />,
+    children: [
       {
-        index: true, // Это значит, что MainPage будет рендериться по пути '/'
+        index: true,
         element: <MainPage />,
       },
       {
         path: '/apps/:appId',
         element: <AppDetailPage />,
+      },
+      {
+        path: '/category/:categoryName',
+        element: <MainPage />,
       },
     ]
   },

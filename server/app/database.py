@@ -13,7 +13,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-# === Dependency для получения сессии БД ===
+# Получения сессии БД
 def get_db():
     db = SessionLocal()
     try:
