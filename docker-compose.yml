@@ -11,7 +11,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     ports:
-      - "5436:5432" # Открываем порт для локального подключения
+      - "5436:5432" # был выбран порт 5436, так как порты с 5432 до 5435 заняты
     restart: unless-stopped
 
 volumes:

@@ -1,9 +1,27 @@
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { MainPage } from './pages/MainPage';
+import { AppDetailPage } from './pages/AppDetailPage';
+import { RootLayout } from './RootLayout';
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <RootLayout />, // Теперь корневой элемент - это наш Layout
+    children: [ // А страницы становятся его дочерними элементами
+      {
+        index: true, // Это значит, что MainPage будет рендериться по пути '/'
+        element: <MainPage />,
+      },
+      {
+        path: '/apps/:appId',
+        element: <AppDetailPage />,
+      },
+    ]
+  },
+]);
+
 function App() {
-  return (
-    <div className="bg-gray-900 text-white min-h-screen flex items-center justify-center">
-      <h1 className="text-4xl font-bold">Frontend RuStore Showcase</h1>
-    </div>
-  )
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;
