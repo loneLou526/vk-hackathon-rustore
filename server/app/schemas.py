@@ -22,3 +22,19 @@ class App(AppBase):
 
     class Config:
         orm_mode = True
+
+class ReviewBase(BaseModel):
+    author: str
+    text: str
+    rating: int
+
+class ReviewCreate(ReviewBase):
+    pass
+
+class Review(ReviewBase):
+    id: int
+    created_at: datetime
+    app_id: int
+
+    class Config:
+        orm_mode = True

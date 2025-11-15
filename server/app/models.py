@@ -1,5 +1,7 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
+
 from .database import Base
 
 
@@ -11,11 +13,25 @@ class App(Base):
     description = Column(String)
     category = Column(String, index=True)
     rating = Column(Float, default=0.0)
-    # Добавьте URL'ы для иконок и скриншотов
     icon_url = Column(String)
-    screenshots = Column(String)  # Будем хранить URL'ы через запятую
+    screenshots = Column(String)
     developer = Column(String)
     age_rating = Column(String)
 
     view_count = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    reviews = relationship("Review", back_populates="app")
+
+
+class Review(Base):
+    __tablename__ = "reviews"
+
+    id = Column(Integer, primary_key=True, index=True)
+    author = Column(String, default="Аноним")
+    text = Column(String)
+    rating = Column(Integer)  # Оценка от 1 до 5
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    app_id = Column(Integer, ForeignKey("apps.id"))
+    app = relationship("App", back_populates="reviews")
