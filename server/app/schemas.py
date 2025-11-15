@@ -1,7 +1,25 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
+# --- Схемы для Отзывов ---
+class ReviewBase(BaseModel):
+    author: str
+    text: str
+    rating: int
+
+class ReviewCreate(ReviewBase):
+    pass
+
+class Review(ReviewBase):
+    id: int
+    created_at: datetime
+    app_id: int
+
+    class Config:
+        orm_mode = True
+
+# --- Схемы для Приложений ---
 class AppBase(BaseModel):
     name: str
     description: str
@@ -23,18 +41,27 @@ class App(AppBase):
     class Config:
         orm_mode = True
 
-class ReviewBase(BaseModel):
-    author: str
-    text: str
-    rating: int
+# --- Схемы для Пользователей и Токенов ---
+class UserBase(BaseModel):
+    username: str
+    email: str
 
-class ReviewCreate(ReviewBase):
-    pass
+class UserCreate(UserBase):
+    password: str = Field(..., min_length=8, max_length=72)
 
-class Review(ReviewBase):
+class User(UserBase):
     id: int
-    created_at: datetime
-    app_id: int
+    is_active: bool
+    level: int
+    xp: int
+    pixels: int
 
     class Config:
         orm_mode = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
