@@ -1,5 +1,5 @@
 import {Link, useLocation, useParams} from 'react-router-dom';
-
+import {useUserStore} from '../store/userStore';
 // Иконки SVG
 const AppIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -29,21 +29,26 @@ const menuItems = [
 export const Sidebar = () => {
     const location = useLocation();
     const params = useParams();
+    const {user, logout} = useUserStore();
     const currentPath = params.categoryName ? `/category/${params.categoryName}` : location.pathname;
 
+    const xpForNextLevel = user ? user.level * 100 : 100;
+    const xpPercentage = user ? Math.min((user.xp / xpForNextLevel) * 100, 100) : 0;
+    const userInitial = user?.username ? user.username[0].toUpperCase() : '?';
     return (
         <aside className="w-64 flex-shrink-0 bg-[#2a2a2b] p-6 hidden md:block border-r border-gray-700/50">
-            <div className="text-white text-2xl font-bold mb-12 flex items-center gap-2">
-                <svg version="1.1" id="Слой_1" xmlns="http://www.w3.org/2000/svg"
-                     xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
-                     y="0px"
-                     viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" xml:space="preserve">
+            <div>
+                <div className="text-white text-2xl font-bold mb-12 flex items-center gap-2">
+                    <svg version="1.1" id="Слой_1" xmlns="http://www.w3.org/2000/svg"
+                         xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+                         y="0px"
+                         viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" xml:space="preserve">
 <path fill="#0077FF" d="M70.2944031,929.7059937C140.5890045,1000,253.7260132,1000,480,1000h40
 	c226.2739868,0,339.4099731,0,409.7059937-70.2940063C1000,859.4099731,1000,746.2719727,1000,519.9979858v-40
 	c0-226.276001,0-339.4133911-70.2940063-409.7077942C859.4099731-0.00002,746.2739868,0,520,0h-40
 	C253.7260132,0.00002,140.5890045,0.00002,70.2944031,70.2901993C-0.00002,140.5845947,0,253.7219849,0,479.9979858v40
 	C0.00002,746.2719727,0.00002,859.4119873,70.2944031,929.7059937z"/>
-                    <path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M772.0560303,664.6779785l-67.56604-16.8779907
+                        <path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M772.0560303,664.6779785l-67.56604-16.8779907
 	c-8.1359863-2.3339844-13.882019-9.6560059-14.1719971-18.1640015l-8.4320068-248.6859741
 	c-2.4379883-32.9160156-26.8720093-59.0940247-52.4060059-66.8040161c-1.4320068-0.4320068-2.9639893,0.1499939-3.8119507,1.3840027
 	c-0.8640137,1.2520142-0.5300293,2.9880066,0.6739502,3.9200134C632.6459961,324.3299866,650,340.2579956,650,367.7319946
@@ -59,27 +64,22 @@ export const Sidebar = () => {
 	c26.9420166,6.7299957,45.8339844,30.8320007,45.8339844,58.473999v325.6560059
 	C832.3259888,649.2960205,802.65802,672.3220215,772.0560303,664.6779785z"/>
 </svg>
-                RuStore
+                    <span>RuStore</span>
+                </div>
+                <nav>
+                    <ul>
+                        {menuItems.map((item) => (
+                            <li key={item.name} className="mb-2">
+                                <Link to={item.path}
+                                      className={`flex items-center gap-3 px-3 py-2 rounded-lg transition text-base font-medium ${currentPath === item.path ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-700/50 hover:text-white'}`}>
+                                    {item.icon}
+                                    <span>{item.name}</span>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
             </div>
-            <nav>
-                <ul>
-                    {menuItems.map((item) => (
-                        <li key={item.name} className="mb-2">
-                            <Link
-                                to={item.path}
-                                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition text-lg ${
-                                    currentPath === item.path
-                                        ? 'bg-blue-600 text-white'
-                                        : 'text-gray-400 hover:bg-gray-700/50 hover:text-white'
-                                }`}
-                            >
-                                {item.icon}
-                                <span>{item.name}</span>
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            </nav>
         </aside>
     );
 };

@@ -1,8 +1,9 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination, EffectFade } from 'swiper/modules';
+import { Autoplay, Pagination, EffectFade, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
+import 'swiper/css/navigation';
 
 import type { IApp } from '../types/app';
 import { Link } from 'react-router-dom';
@@ -21,9 +22,9 @@ export const AppCarousel = ({ apps }: AppCarouselProps) => {
   const bannerApps = apps.slice(0, 5);
 
   return (
-    <div className="mb-12">
+    <div className="mb-12 relative group">
       <Swiper
-        modules={[Autoplay, Pagination, EffectFade]}
+        modules={[Autoplay, Pagination, EffectFade, Navigation]}
         effect="fade"
         spaceBetween={30}
         slidesPerView={1}
@@ -33,8 +34,25 @@ export const AppCarousel = ({ apps }: AppCarouselProps) => {
           disableOnInteraction: false,
         }}
         pagination={{ clickable: true }}
+        navigation={{
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        }}
         className="rounded-2xl"
       >
+        <SwiperSlide>
+            <Link to="/wheel">
+              <div className="relative aspect-[16/7] bg-gradient-to-r from-purple-600 to-blue-500 rounded-2xl overflow-hidden">
+                <div className="absolute inset-0 flex items-center p-8 md:p-12">
+                  <div className="w-full text-center">
+                      <h2 className="text-4xl font-black text-white uppercase tracking-wider">Колесо Удачи</h2>
+                      <p className="text-lg text-white/80 mt-2">Крути и выигрывай призы от VK Музыки и партнеров!</p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+        </SwiperSlide>
+
         {bannerApps.map(app => (
           <SwiperSlide key={app.id}>
             <Link to={`/apps/${app.id}`}>
@@ -55,6 +73,8 @@ export const AppCarousel = ({ apps }: AppCarouselProps) => {
           </SwiperSlide>
         ))}
       </Swiper>
+      <div className="swiper-button-prev absolute top-1/2 -translate-y-1/2 left-4 z-10 p-2 rounded-full bg-black/20 text-white cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"></div>
+      <div className="swiper-button-next absolute top-1/2 -translate-y-1/2 right-4 z-10 p-2 rounded-full bg-black/20 text-white cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"></div>
     </div>
   );
 };
