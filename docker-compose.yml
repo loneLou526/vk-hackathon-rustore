@@ -4,15 +4,48 @@ services:
   db:
     image: postgres:15-alpine
     container_name: rustore_db
+    env_file: .env
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - rustore-net
+
+  backend:
+    build:
+      context: ./server
+    container_name: rustore_backend
+    env_file: .env
+    environment:
+      # Внутри docker-сети обращаемся к сервису db:5432
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      SECRET_KEY: ${SECRET_KEY}
+      ALGORITHM: ${ALGORITHM}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
+    depends_on:
+      - db
+    networks:
+      - rustore-net
+
+  frontend:
+    build:
+      context: ./client
+      args:
+        # на всякий случай, но по факту у нас и так /api/v1 в коде
+        VITE_API_BASE_URL: /api/v1
+    container_name: rustore_frontend
+    depends_on:
+      - backend
     ports:
-      - "5436:5432" # был выбран порт 5436, так как порты с 5432 до 5435 заняты
-    restart: unless-stopped
+      - "80:80"   # снаружи сервер слушает 80 порт
+    networks:
+      - rustore-net
 
 volumes:
   postgres_data:
+
+networks:
+  rustore-net:

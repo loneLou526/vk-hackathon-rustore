@@ -6,6 +6,7 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { WheelPage } from './pages/WheelPage';
+import { StorePage } from './pages/StorePage';
 
 const router = createBrowserRouter([
   {
@@ -14,16 +15,14 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <MainPage /> },
       { path: '/apps/:appId', element: <AppDetailPage /> },
-      { path: '/category/:categoryName', element: <MainPage /> },
       { path: '/profile', element: <ProfilePage /> },
       { path: '/wheel', element: <WheelPage /> },
-    ]
+      { path: '/store', element: <StorePage /> },   // 🔥 Магазин наград
+    ],
   },
   { path: '/login', element: <LoginPage /> },
-  { path: '/register', element: <RegisterPage /> }
+  { path: '/register', element: <RegisterPage /> },
 ]);
-
-
 
 function App() {
   return <RouterProvider router={router} />;

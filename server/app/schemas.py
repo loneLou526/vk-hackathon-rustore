@@ -4,7 +4,6 @@ from typing import List, Optional
 
 # --- Схемы для Отзывов ---
 class ReviewBase(BaseModel):
-    author: str
     text: str
     rating: int
 
@@ -13,8 +12,8 @@ class ReviewCreate(ReviewBase):
 
 class Review(ReviewBase):
     id: int
+    author: str
     created_at: datetime
-    app_id: int
 
     class Config:
         orm_mode = True
@@ -57,6 +56,7 @@ class User(UserBase):
     pixels: int
 
     class Config:
+        from_attributes = True
         orm_mode = True
 
 class Token(BaseModel):
@@ -65,3 +65,26 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+
+# --- Схемы для колеса ---
+class Event(BaseModel):
+    type: str # 'APP_VIEWED' или 'REVIEW_POSTED'
+    appId: Optional[int] = None
+
+# --- Схемы для Магазина Наград ---
+
+class StoreItem(BaseModel):
+    id: int
+    name: str
+    description: str
+    price: int  # Стоимость в Пикселях
+    image_url: Optional[str] = None
+
+
+class StorePurchaseRequest(BaseModel):
+    # itemId — такое поле будем отправлять с фронта
+    item_id: int = Field(..., alias="itemId")
+
+    class Config:
+        # Разрешаем принимать и itemId, и item_id
+        allow_population_by_field_name = True
