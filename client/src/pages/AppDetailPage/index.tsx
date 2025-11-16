@@ -6,17 +6,16 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PageWrapper } from '../../components/PageWrapper';
 import { trackAppView } from '../../services/achievementService';
-import type { AchievementToast, IAchievement } from '../../components/AchievementToast';
+import { AchievementToast, type IAchievement } from '../../components/AchievementToast';
 import { ReviewCard, type IReview } from '../../components/ReviewCard';
 import { ReviewForm } from '../../components/ReviewForm';
+import { useUserStore } from '../../store/userStore';
 
-// Функция для получения данных приложения
 const fetchAppById = async (appId: string): Promise<IApp> => {
   const response = await apiClient.get(`/apps/${appId}`);
   return response.data;
 };
 
-// Функция для получения отзывов
 const fetchReviews = async (appId: string): Promise<IReview[]> => {
   const response = await apiClient.get(`/apps/${appId}/reviews`);
   return response.data;
@@ -29,6 +28,7 @@ const incrementViewCount = (appId: string) => {
 export const AppDetailPage = () => {
   const { appId } = useParams<{ appId: string }>();
   const [newAchievement, setNewAchievement] = useState<IAchievement | null>(null);
+  const setUser = useUserStore((state) => state.setUser);
 
   const { data: app, isLoading: isAppLoading, isError: isAppError } = useQuery<IApp>({
     queryKey: ['app', appId],
@@ -42,15 +42,40 @@ export const AppDetailPage = () => {
     enabled: !!appId,
   });
 
-  useEffect(() => {
-    if (appId && app) {
-        incrementViewCount(appId);
-        const achievement = trackAppView(app.id, app.category);
-        if (achievement) {
-          setNewAchievement(achievement);
-        }
+  const token = useUserStore((state) => state.token);
+
+    useEffect(() => {
+    if (!appId || !app) return;
+
+    // 1) Локально: увеличиваем счётчик просмотров для приложения
+    incrementViewCount(appId);
+
+    // 2) Локально: считаем ачивки за просмотры
+    const achievement = trackAppView(app.id, app.category);
+    if (achievement) {
+      setNewAchievement(achievement);
     }
-  }, [appId, app]);
+
+    // 3) На бэкенд шлём событие только если пользователь залогинен
+    if (!token) return;
+
+    const sendEvent = async () => {
+      try {
+        const { data } = await apiClient.post('/events', {
+          type: 'APP_VIEWED',
+          appId: app.id,
+        });
+
+        // data — это обновлённый пользователь (XP, пиксели, уровень)
+        setUser(data, token);
+      } catch (error) {
+        console.error('Failed to track APP_VIEWED event:', error);
+      }
+    };
+
+    sendEvent();
+  }, [appId, app, token, setUser]);
+
 
   const screenshots = app?.screenshots.split(',') || [];
 
@@ -95,7 +120,6 @@ export const AppDetailPage = () => {
                         </div>
                     </div>
 
-                    {/* Блок с отзывами */}
                     <div className="mt-10">
                         <h2 className="text-2xl font-semibold border-b border-gray-700 pb-2 mb-4">Отзывы</h2>
                         <ReviewForm appId={app.id} />

@@ -116,12 +116,12 @@ export const MainPage = () => {
 
 const Card = ({ app }: { app: IApp }) => (
     <MotionLink to={`/apps/${app.id}`} variants={gridItemVariants} className="group flex flex-col h-full bg-[#2a2a2b] p-4 rounded-xl shadow-lg hover:shadow-blue-500/20 transition-all duration-300 ease-in-out hover:transform hover:-translate-y-1">
-        <div className="aspect-square w-full">
+        <div className="aspect-square w-full overflow-hidden">
             <motion.img layoutId={`app-icon-${app.id}`} src={app.icon_url} alt={app.name} className="w-full h-full object-cover rounded-lg"/>
         </div>
         <div className="flex flex-col mt-4">
             <h3 className="font-semibold text-base text-white truncate">{app.name}</h3>
-            <p className="text-sm text-gray-400">{app.category}</p>
+            <p className="text-sm text-gray-400 truncate" >{app.category}</p>
         </div>
     </MotionLink>
 );
